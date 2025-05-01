@@ -1,0 +1,89 @@
+// /home/ubuntu/prayer-generator-backend/api/generate-prayer.js
+// Example Node.js backend function (e.g., for Vercel Serverless Functions)
+
+// You might need to install node-fetch: npm install node-fetch
+// Or use the built-in fetch in newer Node.js versions
+const fetch = require("node-fetch");
+
+// Allow CORS for all origins (adjust in production for security)
+const allowCors = fn => async (req, res) => {
+  res.setHeader("Access-Control-Allow-Credentials", true);
+  res.setHeader("Access-Control-Allow-Origin", "*"); // Or specific origin
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version"
+  );
+  if (req.method === "OPTIONS") {
+    res.status(200).end();
+    return;
+  }
+  return await fn(req, res);
+};
+
+const handler = async (req, res) => {
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method Not Allowed" });
+  }
+
+  const { userInput } = req.body;
+
+  if (!userInput) {
+    return res.status(400).json({ error: "User input is required" });
+  }
+
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    console.error("OpenAI API key not found in environment variables.");
+    return res.status(500).json({ error: "Server configuration error" });
+  }
+
+  // The detailed prompt provided by the user
+  const systemPrompt = `You are a prophetic intercessor trained on scripture, spiritual warfare manuals, and declarations from revivalists and deliverance ministers like Derek Prince and Daniel Duval. You have memorized foundational prayer structures. A user is in spiritual need. Based on the input below, generate a personalized, powerful prayer filled with compassion and biblical truth. Integrate direct or paraphrased scripture naturally. Include elements of repentance, surrender, alignment, spiritual authority, and breakthrough. Conclude with spiritual strength, peace, and a confident Amen. Keep it 600 characters or less. Respond in natural language.`;
+
+  const userMessage = `User's situation: ${userInput}`;
+
+  try {
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        // Recommend using gpt-4o for best capability/cost or gpt-4-turbo
+        // Use gpt-3.5-turbo for lower cost if preferred
+        model: "gpt-4o", 
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userMessage },
+        ],
+        max_tokens: 150, // Adjust based on typical prayer length (~600 chars)
+        temperature: 0.7, // Adjust for creativity vs consistency
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("OpenAI API Error:", errorData);
+      throw new Error(`OpenAI API error: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    const prayer = data.choices[0]?.message?.content?.trim();
+
+    if (!prayer) {
+        console.error("No prayer content received from OpenAI:", data);
+        throw new Error("Failed to generate prayer content.");
+    }
+
+    res.status(200).json({ prayer });
+
+  } catch (error) {
+    console.error("Error calling OpenAI API:", error);
+    res.status(500).json({ error: "Failed to generate prayer" });
+  }
+};
+
+module.exports = allowCors(handler);
+
