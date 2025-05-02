@@ -1,9 +1,7 @@
 // /home/ubuntu/prayer-generator-backend/api/generate-prayer.js
 // Example Node.js backend function (e.g., for Vercel Serverless Functions)
 
-// You might need to install node-fetch: npm install node-fetch
-// Or use the built-in fetch in newer Node.js versions
-const fetch = require("node-fetch");
+// REMOVED: const fetch = require("node-fetch"); // Use Vercel's native fetch
 
 // Allow CORS for all origins (adjust in production for security)
 const allowCors = fn => async (req, res) => {
@@ -30,7 +28,17 @@ const handler = async (req, res) => {
     return res.status(405).json({ error: "Method Not Allowed" });
   }
 
-  const { userInput } = req.body;
+  // Ensure req.body is parsed (Vercel usually does this automatically for JSON)
+  let userInput;
+  try {
+    // Vercel might provide parsed body directly, or sometimes needs JSON.parse
+    userInput = typeof req.body === 'string' ? JSON.parse(req.body).userInput : req.body.userInput;
+  } catch (parseError) {
+    console.error("Failed to parse request body:", parseError);
+    console.error("Raw request body:", req.body);
+    return res.status(400).json({ error: "Invalid request body format" });
+  }
+  
   console.log("Received userInput:", userInput); // Log received input
 
   if (!userInput) {
@@ -52,7 +60,7 @@ const handler = async (req, res) => {
   const userMessage = `User's situation: ${userInput}`;
 
   try {
-    console.log("Attempting to call OpenAI API...");
+    console.log("Attempting to call OpenAI API using native fetch...");
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
