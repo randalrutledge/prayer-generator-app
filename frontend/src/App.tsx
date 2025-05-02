@@ -3,9 +3,9 @@ import { useState } from 'react';
 import './App.css'; // Ensure App.css is imported if needed, though index.css handles Tailwind
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardFooter } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area'; // Import ScrollArea
-import { Copy, RefreshCw, Sparkles } from 'lucide-react'; // Import icons
+import { Copy, RefreshCw } from 'lucide-react'; // Import icons
 
 function App() {
   const [userInput, setUserInput] = useState('');
@@ -73,31 +73,27 @@ function App() {
   };
 
   return (
-    // Updated background with image and overlay
-    <div 
-      className="min-h-screen bg-cover bg-center flex flex-col items-center justify-center p-4 font-['Inter',sans-serif] relative" 
-      style={{ backgroundImage: `url('/assets/spiritual_background_abstract.jpeg')` }}
-    >
-      {/* Overlay for readability */}
-      <div className="absolute inset-0 bg-gradient-to-b from-blue-50/80 via-sky-100/80 to-amber-50/80 z-0"></div>
+    // Updated background to dark blue, centered content
+    <div className="min-h-screen bg-[#0a2540] flex flex-col items-center justify-center p-4 font-['Inter',sans-serif]">
       
       {/* Content container */}
-      <div className="relative z-10 flex flex-col items-center w-full">
-        {/* App Title Added Here */}
-        <h1 className="text-4xl font-bold text-blue-900 mb-6 text-center tracking-tight flex items-center">
-          <Sparkles className="w-8 h-8 mr-3 text-amber-600" />
-          Personal Prayer Generator
-        </h1>
+      <div className="flex flex-col items-center w-full max-w-2xl">
+        {/* Logo and Title Section */}
+        <div className="mb-8 text-center">
+          <img src="/assets/logo.png" alt="PowerPrayer.ai Logo" className="w-24 h-24 mx-auto mb-4" />
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-2 tracking-tight">POWERPRAYER.AI</h1>
+          <p className="text-lg text-gray-300">Empowering Your Spiritual Journey with AI-Driven Prayers</p>
+        </div>
 
-        <Card className="w-full max-w-xl shadow-xl bg-white/95 backdrop-blur-sm rounded-xl overflow-hidden border border-gray-200">
-          <CardHeader className="text-center bg-gradient-to-r from-sky-100/80 to-blue-100/80 p-6 border-b border-gray-200/50">
-            <CardTitle className="text-2xl font-semibold text-blue-800 tracking-tight">Feeling Overwhelmed?</CardTitle>
-            <CardDescription className="text-blue-700 mt-1 text-md">Receive a Personalized Prayer Now</CardDescription>
+        <Card className="w-full shadow-xl bg-[#1e3a5f]/80 backdrop-blur-sm rounded-xl overflow-hidden border border-gray-600/50">
+          <CardHeader className="text-center p-6 border-b border-gray-600/50">
+            {/* Simplified Header */}
+            <h2 className="text-2xl font-semibold text-white tracking-tight">What are you going through?</h2>
           </CardHeader>
           <CardContent className="p-6 md:p-8">
             {/* Display Error Message */}
             {error && (
-              <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-md text-sm">
+              <div className="mb-4 p-3 bg-red-900/50 border border-red-600 text-red-200 rounded-md text-sm">
                 <strong>Error:</strong> {error}
               </div>
             )}
@@ -106,16 +102,16 @@ function App() {
               // Landing Section (Show if no prayer and no error)
               <div className="space-y-5">
                 <Textarea
-                  placeholder="Tell us what you're going through…"
+                  placeholder="Tell us here..."
                   value={userInput}
                   onChange={handleInputChange}
-                  className="min-h-[120px] border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-lg text-base p-3 shadow-sm bg-white/70"
+                  className="min-h-[120px] border-gray-500 focus:border-[#f0b90b] focus:ring-2 focus:ring-[#f0b90b]/50 rounded-lg text-base p-3 shadow-sm bg-[#0a2540]/70 text-white placeholder-gray-400"
                   disabled={isLoading}
                 />
                 <Button
                   onClick={handleSubmit}
                   size="lg" // Larger button
-                  className="w-full bg-gradient-to-r from-blue-600 to-sky-500 hover:from-blue-700 hover:to-sky-600 text-white font-semibold py-3 rounded-lg transition duration-300 ease-in-out disabled:opacity-60 shadow-md hover:shadow-lg text-lg"
+                  className="w-full bg-[#f0b90b] hover:bg-[#f3c84b] text-[#0a2540] font-bold py-3 rounded-lg transition duration-300 ease-in-out disabled:opacity-60 shadow-md hover:shadow-lg text-lg"
                   disabled={isLoading || !userInput.trim()}
                 >
                   {isLoading ? (
@@ -133,9 +129,10 @@ function App() {
               <div className="space-y-5 animate-fade-in">
                 {prayer && (
                   <>
-                    <h3 className="text-xl font-semibold text-center text-blue-700">Your Personalized Prayer:</h3>
-                    <ScrollArea className="h-60 w-full rounded-md border border-blue-100 bg-sky-50/70 p-4 shadow-inner">
-                      <p className="text-gray-900 whitespace-pre-wrap font-[Georgia,serif] text-lg leading-relaxed">{prayer}</p>
+                    <h3 className="text-xl font-semibold text-center text-gray-200">Your Personalized Prayer:</h3>
+                    <ScrollArea className="h-60 w-full rounded-md border border-gray-600 bg-[#0a2540]/70 p-4 shadow-inner">
+                      {/* Using a more readable serif font for prayer */}
+                      <p className="text-gray-100 whitespace-pre-wrap font-[Georgia,serif] text-lg leading-relaxed">{prayer}</p>
                     </ScrollArea>
                   </>
                 )}
@@ -144,7 +141,7 @@ function App() {
                     <Button
                       onClick={handleCopy}
                       variant="outline"
-                      className="w-full sm:w-auto border-blue-500 text-blue-600 hover:bg-blue-100 rounded-lg shadow-sm hover:shadow-md flex items-center justify-center bg-white/80 hover:bg-blue-50/80"
+                      className="w-full sm:w-auto border-[#f0b90b] text-[#f0b90b] hover:bg-[#f0b90b]/20 rounded-lg shadow-sm hover:shadow-md flex items-center justify-center bg-transparent"
                     >
                       <Copy className="mr-2 h-4 w-4" />
                       {copied ? 'Copied!' : 'Copy Prayer'}
@@ -153,7 +150,7 @@ function App() {
                   <Button
                     onClick={handleResubmit}
                     variant="outline"
-                    className="w-full sm:w-auto border-amber-500 text-amber-700 hover:bg-amber-100 rounded-lg shadow-sm hover:shadow-md flex items-center justify-center bg-white/80 hover:bg-amber-50/80"
+                    className="w-full sm:w-auto border-gray-500 text-gray-300 hover:bg-gray-700/50 rounded-lg shadow-sm hover:shadow-md flex items-center justify-center bg-transparent"
                   >
                      <RefreshCw className="mr-2 h-4 w-4" />
                     New Request
@@ -162,8 +159,8 @@ function App() {
               </div>
             )}
           </CardContent>
-          <CardFooter className="bg-gray-50/80 p-4 border-t border-gray-200/50">
-              <p className="text-center text-gray-600 text-xs italic w-full">"Come to me, all you who are weary and burdened, and I will give you rest." - Matthew 11:28</p>
+          <CardFooter className="bg-[#0a2540]/50 p-4 border-t border-gray-600/50">
+              <p className="text-center text-gray-400 text-xs italic w-full">"Come to me, all you who are weary and burdened, and I will give you rest." - Matthew 11:28</p>
           </CardFooter>
         </Card>
       </div>
