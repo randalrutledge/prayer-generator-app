@@ -38,8 +38,16 @@ function App() {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || `API error: ${response.statusText}`);
+        // Attempt to read response as text first, as it might not be JSON
+        const errorText = await response.text(); 
+        try {
+          // Try parsing as JSON if possible
+          const errorData = JSON.parse(errorText);
+          throw new Error(errorData.error || `API error: ${response.statusText}`);
+        } catch (parseError) {
+          // If parsing fails, use the raw text (helpful for non-JSON errors like HTML error pages)
+          throw new Error(`API error ${response.status}: ${errorText.substring(0, 200)}...`); 
+        }
       }
 
       const data = await response.json();
@@ -78,9 +86,10 @@ function App() {
       
       {/* Content container */}
       <div className="flex flex-col items-center w-full max-w-2xl">
-        {/* Logo and Title Section */}
+        {/* Logo and Title Section - Revised Layout */}
         <div className="mb-8 text-center">
-          <img src="/assets/logo.png" alt="PowerPrayer.ai Logo" className="w-24 h-24 mx-auto mb-4" />
+          {/* Use transparent logo, smaller size */}
+          <img src="/assets/logo_transparent.png" alt="PowerPrayer.ai Logo" className="w-20 h-20 mx-auto mb-4" /> 
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-2 tracking-tight">POWERPRAYER.AI</h1>
           <p className="text-lg text-gray-300">Empowering Your Spiritual Journey with AI-Driven Prayers</p>
         </div>
